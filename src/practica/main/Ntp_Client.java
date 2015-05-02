@@ -27,8 +27,12 @@ public class Ntp_Client {
             DataOutputStream salida = new DataOutputStream(socket.getOutputStream());
             Date tiempo = new Date();
             String envio=Long.toString(tiempo.getTime());
-            
+            salida.writeUTF(envio);
+            socket.close();
             DataInputStream entrada =  new DataInputStream(socket.getInputStream());
+            //sudo su
+            // date -s 17:32
+
         }
         catch(IOException ex) {
             ex.printStackTrace();
