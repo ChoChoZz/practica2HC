@@ -30,6 +30,8 @@ public class Ntp_Client {
             salida.writeUTF(envio);
             socket.close();
             DataInputStream entrada =  new DataInputStream(socket.getInputStream());
+            String horaS=entrada.readUTF();
+            System.out.println("el horario en server es: "+horaS);
             //sudo su
             // date -s 17:32
 
