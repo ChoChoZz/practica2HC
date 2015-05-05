@@ -95,14 +95,15 @@ public class Ntp_Client extends Thread {
             }
             System.out.println();
         }*/
+        //obtenemos la min latecia y compensacion [0]
         Arrays.sort(Latencia);// ordenamos el arrays de forma ascendente
         Arrays.sort(Compensacion);// ordenamos el arrays de forma ascendente
         //mostramos el arrays
         // for (Double lat : Latencia) { 
         //    System.out.println("lat: " + lat);
         //}
-        Date T =new Date();
-        Double Hora = T.getTime() + Compensacion[0];
+        Date T =new Date(); //obtenemos la fecha
+        Double Hora = T.getTime() + Compensacion[0]; //sumamos la compensacion a  la fecha
 
         String H =Double.toString(Hora);
         
