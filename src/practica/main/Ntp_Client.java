@@ -55,7 +55,7 @@ public class Ntp_Client extends Thread {
         
        // while (cont < 8) {
             try {
-                Socket socket = new Socket("10.20.3.90", 5000);
+                Socket socket = new Socket("10.20.3.181", 5000);
                 send = new DataOutputStream(socket.getOutputStream());
                 Date tiempo1 = new Date();//hora cliente
                 String envio = Long.toString(tiempo1.getTime()); //convertimos a cadena 
@@ -122,7 +122,7 @@ public class Ntp_Client extends Thread {
         String H =Long.toString(Hora);
         
         try{
-        Runtime.getRuntime().exec("date -s @ " + H); //actualizamos la fecha
+        Runtime.getRuntime().exec("date --set '"+ H+"'"); //actualizamos la fecha
         
         System.out.println(" Establecido correctamente \n");
         }
