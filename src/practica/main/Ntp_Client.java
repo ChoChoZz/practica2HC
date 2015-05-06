@@ -9,10 +9,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import practica.tools.Tiempo;
 
 /**
  *
@@ -23,11 +25,25 @@ public class Ntp_Client extends Thread {
     static Double[] Latencia = new Double[8];
     static Double[] Compensacion = new Double[8];
     static Double[][] tab = new Double[8][2];
+    private static ArrayList<Tiempo> tiempos= new ArrayList<>();
 
-    public static void main(String[] args) {
-
-        Thread t = new Ntp_Client();
-        t.start();
+    public static void main(String[] args) throws InterruptedException {
+        for(int i=0; i < 8; i++) {
+            Thread t = new Ntp_Client();
+            t.start();
+            t.join();
+        }
+        long lat=0,com=0;
+        //System.out.println("el tamanio de tiempo es: "+tiempos.size());
+        for(Tiempo ti:tiempos){
+            if(ti.getLatencia() <= lat){
+                lat = ti.getLatencia();
+                com = ti.getCompensacion();
+            }
+        }
+        
+        actualiza(com);
+        //System.out.println("lat es: "+lat+" y com es: "+com);
 
     }//end main 
 
@@ -39,7 +55,7 @@ public class Ntp_Client extends Thread {
         double A, B, C;
         int cont = 0;
         
-        while (cont < 8) {
+       // while (cont < 8) {
             try {
                 Socket socket = new Socket("127.0.0.1", 5000);
                 send = new DataOutputStream(socket.getOutputStream());
@@ -67,6 +83,9 @@ public class Ntp_Client extends Thread {
                 Latencia[cont] = (A + C) / 2; //delay
                 Compensacion[cont] = (A + B) / 2; //offset
                 
+                Tiempo ti =  new Tiempo(Math.round(Latencia[cont]),Math.round(Compensacion[cont]) );
+                tiempos.add(ti);
+                
                 tab[cont][0] = Latencia[cont]; // creamos una matriz
                 tab[cont][1] = Compensacion[cont];
 
@@ -79,11 +98,11 @@ public class Ntp_Client extends Thread {
                 ex.printStackTrace();
             }
             cont++;
-        }//end while
-        Actualiza();
+        //}//end while
+       // Actualiza();
     }//end Run
 
-    public void Actualiza(){
+    public static void actualiza(long compensacion){
       
         System.out.println();
         
@@ -96,19 +115,19 @@ public class Ntp_Client extends Thread {
             System.out.println();
         }*/
         //obtenemos la min latecia y compensacion [0]
-        Arrays.sort(Latencia);// ordenamos el arrays de forma ascendente
-        Arrays.sort(Compensacion);// ordenamos el arrays de forma ascendente
+        //Arrays.sort(Latencia);// ordenamos el arrays de forma ascendente
+        //Arrays.sort(Compensacion);// ordenamos el arrays de forma ascendente
         //mostramos el arrays
         // for (Double lat : Latencia) { 
         //    System.out.println("lat: " + lat);
         //}
         Date T =new Date(); //obtenemos la fecha
-        Double Hora = T.getTime() + Compensacion[0]; //sumamos la compensacion a  la fecha
+        Long Hora = T.getTime() + compensacion; //sumamos la compensacion a  la fecha
 
-        String H =Double.toString(Hora);
+        String H =Long.toString(Hora);
         
         try{
-        Runtime.getRuntime().exec("date -s @" + H); //actualizamos la fecha
+        Runtime.getRuntime().exec("date -s @ " + H); //actualizamos la fecha
         
         System.out.println(" Establecido correctamente \n");
         }
