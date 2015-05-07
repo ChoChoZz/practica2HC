@@ -12,8 +12,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import practica.tools.Tiempo;
 
 /**
@@ -22,8 +20,8 @@ import practica.tools.Tiempo;
  */
 public class Ntp_Client extends Thread {
     
-    static Double[] Latencia = new Double[8];
-    static Double[] Compensacion = new Double[8];
+    static Double[] latencia = new Double[8];
+    static Double[] compensacion = new Double[8];
     static Double[][] tab = new Double[8][2];
     private static ArrayList<Tiempo> tiempos= new ArrayList<>();
 
@@ -57,7 +55,7 @@ public class Ntp_Client extends Thread {
         
        // while (cont < 8) {
             try {
-                Socket socket = new Socket("127.0.0.1", 5000);
+                Socket socket = new Socket("10.20.3.90", 5000);
                 send = new DataOutputStream(socket.getOutputStream());
                 Date tiempo1 = new Date();//hora cliente
                 String envio = Long.toString(tiempo1.getTime()); //convertimos a cadena 
@@ -65,7 +63,7 @@ public class Ntp_Client extends Thread {
 
                 receive = new DataInputStream(socket.getInputStream());
                 String horaS = receive.readUTF(); //hora cliente y servidor
-                System.out.println("el horario "+cont+" en server es: " + horaS);
+        //        System.out.println("el horario "+cont+" en server es: " + horaS);
 
                 Date tiempo2 = new Date();//hora cliente
                 //obtenemos las horas
@@ -80,18 +78,17 @@ public class Ntp_Client extends Thread {
                 B = Double.parseDouble(T2server) - tiempo2.getTime();  // T3-T4
                 C = tiempo2.getTime() - Double.parseDouble(T2server);  // T4-T3
 
-                Latencia[cont] = (A + C) / 2; //delay
-                Compensacion[cont] = (A + B) / 2; //offset
+                latencia[cont] = (A + C) / 2; //delay
+                compensacion[cont] = (A + B) / 2; //offset
                 
-                Tiempo ti =  new Tiempo(Math.round(Latencia[cont]),Math.round(Compensacion[cont]) );
+                Tiempo ti =  new Tiempo(Math.round(latencia[cont]),Math.round(compensacion[cont]) );
                 tiempos.add(ti);
                 
-                tab[cont][0] = Latencia[cont]; // creamos una matriz
-                tab[cont][1] = Compensacion[cont];
+                tab[cont][0] = latencia[cont]; // creamos una matriz
+                tab[cont][1] = compensacion[cont];
 
-                System.out.println("lat: " + Latencia[cont]); 
-                System.out.println("Com: " + Compensacion[cont]);
-
+                //System.out.println("lat: " + Latencia[cont]); 
+                //System.out.println("Com: " + Compensacion[cont]);
 
                 socket.close();
             } catch (IOException ex) {
@@ -103,9 +100,7 @@ public class Ntp_Client extends Thread {
     }//end Run
 
     public static void actualiza(long compensacion){
-      
-        System.out.println();
-        
+              
         /*Arrays.sort(tab);// ordenamos el arrays de forma ascendente
         //imprimimos la tab
         for(int f=0;f<tab.length;f++) {
